@@ -45,6 +45,59 @@ var loadTasks = function () {
   });
 };
 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {
+    // console.log("activate", this);
+  },
+  deactivate: function (event) {
+    // console.log("deactivate", this);
+  },
+  over: function (event) {
+    // console.log("over", event.target);
+  },
+  out: function (event) {
+    // console.log("out", event.target);
+  },
+  update: function (event) {
+    var tempArr = [];
+    // loop over current set of children in sortable list
+    $(this).children().each(function () {
+      var text = $(this)
+        .find("p")
+        .text()
+        .trim();
+
+      var date = $(this)
+        .find("span")
+        .text()
+        .trim();
+
+      // add task data to the temp array as an object
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+    console.log(tempArr);
+
+    // trim down list's ID to match object property
+    var arrName = $(this)
+      .attr("id")
+      .replace("list-", "");
+
+    // update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
+
+
+
+
 // ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
 var saveTasks = function () {
@@ -86,7 +139,7 @@ $(".list-group").on("blur", "textarea", function () {
     .index();
 
   tasks[status][index].text = text;
-  
+
   // recreate p element
   var taskP = $("<p>")
     .addClass("m-1")
@@ -100,7 +153,7 @@ $(".list-group").on("blur", "textarea", function () {
 
 // ⬇︎ FOCUS EVENT: TURNS DUE DATE PILL (<SPAN> ELEMENT) INTO A TEXT INPUT WHEN CLICKED ⬇︎
 // due date was clicked 
-$(".list-group").on("click", "span", function() {
+$(".list-group").on("click", "span", function () {
   // get current text
   var date = $(this)
     .text()
@@ -112,17 +165,17 @@ $(".list-group").on("click", "span", function() {
     .addClass("form-control")
     .val(date);
 
-    // swap out elements
-    $(this).replaceWith(dateInput);
+  // swap out elements
+  $(this).replaceWith(dateInput);
 
-    // automatically focus on new element
-    dateInput.trigger("focus");
+  // automatically focus on new element
+  dateInput.trigger("focus");
 });
 
 
 // ⬇︎ BLUR EVENT: TURNS TEXT INPUT BACK INTO A DUT DATE PILL (<SPAN>) ELEMENT WHEN CLICKED OUTSIDE ⬇︎
 // value of due date was changed
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("blur", "input[type='text']", function () {
   // get current text
   var date = $(this)
     .val()
